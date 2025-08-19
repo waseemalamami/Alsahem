@@ -19,7 +19,7 @@ function App() {
     <ErrorBoundary>
       <AuthProvider>
         <Router>
-          <div className="App">
+          <div className="App w-full min-h-screen m-0 p-0">
             <Routes>
               {/* Public Routes - Available to all users */}
               <Route path="/" element={<VisitorRoute><Index /></VisitorRoute>} />

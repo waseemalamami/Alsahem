@@ -17,7 +17,7 @@ import {
   Star,
   Eye,
   Clock,
-  DollarSign,
+  Coins,
   Target
 } from "lucide-react";
 import Navigation from '@/components/Navigation';
@@ -50,7 +50,12 @@ const Investments = () => {
       views: 234,
       endDate: "2026-03-15",
       propertyType: "فيلا",
-      riskLevel: "medium" as const
+      riskLevel: "medium" as const,
+      // Stock information
+      sharesAvailable: true,
+      totalShares: 5000,
+      availableShares: 1800,
+      stockPrice: 1000
     },
     {
       id: "2",
@@ -69,7 +74,12 @@ const Investments = () => {
       views: 156,
       endDate: "2025-09-20",
       propertyType: "شقة",
-      riskLevel: "low" as const
+      riskLevel: "low" as const,
+      // Stock information
+      sharesAvailable: true,
+      totalShares: 3000,
+      availableShares: 1200,
+      stockPrice: 1000
     },
     {
       id: "3",
@@ -88,7 +98,12 @@ const Investments = () => {
       views: 189,
       endDate: "2027-06-10",
       propertyType: "تجاري",
-      riskLevel: "high" as const
+      riskLevel: "high" as const,
+      // Stock information
+      sharesAvailable: true,
+      totalShares: 8000,
+      availableShares: 800,
+      stockPrice: 1000
     },
     {
       id: "4",
@@ -103,59 +118,45 @@ const Investments = () => {
       maxInvestors: 200,
       status: "active" as const,
       image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400&h=300&fit=crop",
-      rating: 4.4,
+      rating: 4.2,
       views: 98,
-      endDate: "2025-01-30",
+      endDate: "2025-12-31",
       propertyType: "أرض",
-      riskLevel: "low" as const
+      riskLevel: "low" as const,
+      // Stock information
+      sharesAvailable: true,
+      totalShares: 2000,
+      availableShares: 1200,
+      stockPrice: 1000
     },
     {
       id: "5",
-      title: "فيلات شاطئية فاخرة",
-      location: "زوارة، الشاطئ",
-      totalValue: 12000000,
-      currentValue: 6000000,
-      minInvestment: 150000,
-      expectedReturn: 22.1,
-      duration: 48,
-      investors: 12,
-      maxInvestors: 50,
-      status: "active" as const,
-      image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=300&fit=crop",
-      rating: 4.9,
-      views: 345,
-      endDate: "2028-12-01",
-      propertyType: "فيلا",
-      riskLevel: "high" as const
-    },
-    {
-      id: "6",
       title: "شقق طلابية",
       location: "طرابلس، جامعة طرابلس",
       totalValue: 1500000,
-      currentValue: 1500000,
-      minInvestment: 20000,
+      currentValue: 1200000,
+      minInvestment: 15000,
       expectedReturn: 8.5,
-      duration: 15,
+      duration: 6,
       investors: 156,
       maxInvestors: 300,
-      status: "completed" as const,
-      image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=300&fit=crop",
-      rating: 4.7,
+      status: "active" as const,
+      image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=300&fit=crop",
+      rating: 4.4,
       views: 267,
-      endDate: "2025-05-15",
+      endDate: "2024-12-31",
       propertyType: "شقة",
-      riskLevel: "low" as const
+      riskLevel: "low" as const,
+      // Stock information
+      sharesAvailable: true,
+      totalShares: 1500,
+      availableShares: 300,
+      stockPrice: 1000
     }
   ];
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('ar-LY', {
-      style: 'currency',
-      currency: 'LYD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
+    return `${amount.toLocaleString('en-US')} د.ل`;
   };
 
   const filteredInvestments = investments.filter(investment => {

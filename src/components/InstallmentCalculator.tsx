@@ -73,15 +73,15 @@ const InstallmentCalculator = () => {
           </Select>
         </div>
         
-        <Button onClick={calculateInstallment} className="w-full">
+        <Button onClick={calculateInstallment} className="w-full rounded-2xl">
           احسب القسط الشهري
         </Button>
         
         {monthlyPayment > 0 && (
-          <div className="p-4 bg-blue-50 rounded-lg text-center">
+          <div className="p-4 bg-blue-50 rounded-2xl text-center">
             <p className="text-sm text-gray-600 mb-1">القسط الشهري</p>
             <p className="text-2xl font-bold text-blue-600">
-              {monthlyPayment.toLocaleString('ar-LY')} دينار ليبي
+              {monthlyPayment.toLocaleString('en-US')} دينار ليبي
             </p>
           </div>
         )}

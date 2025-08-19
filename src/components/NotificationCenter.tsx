@@ -6,16 +6,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Bell, 
-  CheckCircle, 
-  AlertCircle, 
-  Info, 
   X, 
+  Check, 
   Clock, 
-  DollarSign, 
-  TrendingUp,
-  Calendar,
-  MessageCircle,
-  Settings
+  TrendingUp, 
+  TrendingDown, 
+  Building2, 
+  Users, 
+  Calendar, 
+  MapPin,
+  Coins,
+  FileText,
+  AlertCircle,
+  Info
 } from "lucide-react";
 
 interface Notification {
@@ -89,7 +92,7 @@ const NotificationCenter = ({ userRole }: NotificationCenterProps) => {
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'success': return <CheckCircle className="h-5 w-5 text-green-600" />;
+      case 'success': return <Check className="h-5 w-5 text-green-600" />;
       case 'warning': return <AlertCircle className="h-5 w-5 text-yellow-600" />;
       case 'error': return <X className="h-5 w-5 text-red-600" />;
       case 'info': return <Info className="h-5 w-5 text-blue-600" />;
@@ -99,11 +102,11 @@ const NotificationCenter = ({ userRole }: NotificationCenterProps) => {
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
-      case 'payment': return <DollarSign className="h-4 w-4" />;
+      case 'payment': return <Coins className="h-4 w-4" />;
       case 'investment': return <TrendingUp className="h-4 w-4" />;
       case 'property': return <Calendar className="h-4 w-4" />;
-      case 'system': return <Settings className="h-4 w-4" />;
-      case 'offer': return <MessageCircle className="h-4 w-4" />;
+      case 'system': return <FileText className="h-4 w-4" />;
+      case 'offer': return <MapPin className="h-4 w-4" />;
       default: return <Info className="h-4 w-4" />;
     }
   };

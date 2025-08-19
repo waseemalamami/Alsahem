@@ -23,7 +23,7 @@ import {
   Clock,
   Users,
   Target,
-  DollarSign,
+  Coins,
   ArrowLeft,
   ChevronLeft,
   ChevronRight,
@@ -113,12 +113,7 @@ const PropertyDetail = () => {
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('ar-LY', {
-      style: 'currency',
-      currency: 'LYD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(price);
+    return `${price.toLocaleString('en-US')} د.ل`;
   };
 
   const nextImage = () => {

@@ -11,7 +11,9 @@ import {
   TrendingUp,
   Building2,
   Calendar,
-  Eye
+  Eye,
+  Coins,
+  PieChart
 } from "lucide-react";
 import { Link } from 'react-router-dom';
 
@@ -35,17 +37,21 @@ interface PropertyCardProps {
     investmentReturn?: number;
     installmentAvailable?: boolean;
     sharesAvailable?: boolean;
+    // New properties for stock information
+    totalShares?: number;
+    availableShares?: number;
+    stockPrice?: number;
+    totalInvestmentValue?: number;
   };
 }
 
 const PropertyCard = ({ property }: PropertyCardProps) => {
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('ar-LY', {
-      style: 'currency',
-      currency: 'LYD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(price);
+    return `${price.toLocaleString('en-US')} د.ل`;
+  };
+
+  const formatStockPrice = (price: number) => {
+    return `${price.toLocaleString('en-US')} د.ل`;
   };
 
   const getStatusColor = (status: string) => {
@@ -75,126 +81,175 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
   };
 
   return (
-    <Card className="group hover:shadow-lg transition-all duration-300 border border-gray-200 overflow-hidden">
-      {/* Image Section - More Compact */}
+    <Card className="group hover:shadow-xl transition-all duration-500 border border-gray-200 overflow-hidden h-full flex flex-col bg-white hover:bg-gray-50/50">
+      {/* Image Section - Responsive */}
       <div className="relative">
         <img 
           src={property.image} 
           alt={property.title}
-          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-40 sm:h-48 lg:h-52 object-cover group-hover:scale-105 transition-transform duration-500"
         />
         
-        {/* Status Badge - Smaller */}
-        <Badge className={`absolute top-2 right-2 text-xs px-2 py-0.5 border ${getStatusColor(property.status)}`}>
+        {/* Status Badge - Responsive positioning */}
+        <Badge className={`absolute top-3 right-3 text-xs px-3 py-1.5 border-2 font-semibold shadow-lg rounded-xl ${getStatusColor(property.status)}`}>
           {getStatusText(property.status)}
         </Badge>
         
-        {/* Investment Return Badge - Smaller */}
+        {/* Investment Return Badge - Responsive positioning */}
         {property.investmentReturn && (
-          <Badge className="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-0.5">
+          <Badge className="absolute top-3 left-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-xs px-3 py-1.5 border-0 font-semibold shadow-lg rounded-xl">
             <TrendingUp className="h-3 w-3 mr-1" />
             {property.investmentReturn}%
           </Badge>
         )}
         
-        {/* Rating - Smaller */}
-        <div className="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1 flex items-center gap-1">
-          <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-          <span className="text-xs font-semibold text-gray-800">{property.rating}</span>
+        {/* Rating - Responsive positioning */}
+        <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-sm rounded-xl px-2.5 py-1.5 flex items-center gap-1.5 shadow-lg">
+          <Star className="h-3.5 w-3.5 text-yellow-500 fill-current" />
+          <span className="text-xs font-semibold text-gray-700">{property.rating}</span>
         </div>
         
-        {/* Views - Smaller */}
-        <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1 flex items-center gap-1">
-          <Eye className="h-3 w-3 text-gray-600" />
-          <span className="text-xs font-semibold text-gray-800">{property.views}</span>
+        {/* Views - Responsive positioning */}
+        <div className="absolute bottom-3 right-3 bg-white/95 backdrop-blur-sm rounded-xl px-2.5 py-1.5 flex items-center gap-1.5 shadow-lg">
+          <Eye className="h-3.5 w-3.5 text-gray-600" />
+          <span className="text-xs font-semibold text-gray-700">{property.views}</span>
         </div>
       </div>
 
-      {/* Content Section - More Compact */}
-      <CardContent className="p-4">
-        {/* Title and Type - More Compact */}
-        <div className="mb-3">
-          <h3 className="font-bold text-gray-900 text-sm mb-1 line-clamp-1 group-hover:text-blue-600 transition-colors">
-            {property.title}
-          </h3>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1 text-xs text-gray-600">
-              <Building2 className="h-3 w-3" />
-              <span>{property.type}</span>
+      {/* Content Section - Responsive */}
+      <CardContent className="p-5 sm:p-6 lg:p-7 flex-1 flex flex-col">
+        {/* Header */}
+        <div className="mb-4 sm:mb-5">
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <h3 className="font-bold text-base sm:text-lg lg:text-xl text-gray-900 leading-tight line-clamp-2 flex-1 group-hover:text-blue-700 transition-colors duration-300">
+              {property.title}
+            </h3>
+            <Badge variant="outline" className="text-xs px-3 py-1.5 flex-shrink-0 border-2 border-blue-200 text-blue-700 bg-blue-50 font-semibold rounded-xl">
+              {property.type}
+            </Badge>
+          </div>
+          
+          <div className="flex items-center gap-2 text-gray-600 mb-3">
+            <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
+            <span className="text-sm sm:text-base line-clamp-1 font-medium">{property.location}</span>
+          </div>
+        </div>
+
+        {/* Stock Information - New Section */}
+        {property.sharesAvailable && property.totalShares && property.availableShares && property.stockPrice && (
+          <div className="mb-4 sm:mb-5 p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border-2 border-blue-200 shadow-sm">
+            <div className="flex items-center gap-2 mb-3">
+              <PieChart className="h-5 w-5 text-blue-600" />
+              <span className="text-sm font-bold text-blue-800">معلومات الأسهم</span>
             </div>
-            <div className="flex items-center gap-1 text-xs text-gray-500">
-              <Calendar className="h-3 w-3" />
-              <span>{property.listedDate}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Location - More Compact */}
-        <div className="flex items-center gap-1 text-xs text-gray-600 mb-3">
-          <MapPin className="h-3 w-3 text-blue-600" />
-          <span className="line-clamp-1">{property.location}</span>
-        </div>
-
-        {/* Property Details - More Compact */}
-        <div className="grid grid-cols-4 gap-2 mb-3">
-          <div className="flex items-center gap-1 text-xs text-gray-600">
-            <Bed className="h-3 w-3" />
-            <span>{property.bedrooms}</span>
-          </div>
-          <div className="flex items-center gap-1 text-xs text-gray-600">
-            <Bath className="h-3 w-3" />
-            <span>{property.bathrooms}</span>
-          </div>
-          <div className="flex items-center gap-1 text-xs text-gray-600">
-            <Square className="h-3 w-3" />
-            <span>{property.area}m²</span>
-          </div>
-          <div className="flex items-center gap-1 text-xs text-gray-600">
-            <Car className="h-3 w-3" />
-            <span>{property.parking}</span>
-          </div>
-        </div>
-
-        {/* Price Section - More Compact */}
-        <div className="mb-3">
-          <div className="flex items-center justify-between">
-            <div className="text-right">
-              <div className="text-lg font-bold text-blue-600">
-                {formatPrice(property.price)}
-              </div>
-              {property.originalPrice && property.originalPrice > property.price && (
-                <div className="text-xs text-gray-500 line-through">
-                  {formatPrice(property.originalPrice)}
+            
+            <div className="grid grid-cols-2 gap-4">
+              {/* Available Shares */}
+              <div className="text-center">
+                <div className="text-xl sm:text-2xl font-bold text-blue-600">
+                  {property.availableShares.toLocaleString('en-US')}
                 </div>
-              )}
+                <div className="text-sm text-blue-700 font-semibold">الأسهم المتاحة</div>
+                <div className="text-xs text-blue-600">
+                  من {property.totalShares.toLocaleString('en-US')}
+                </div>
+              </div>
+              
+              {/* Stock Price */}
+              <div className="text-center">
+                <div className="text-xl sm:text-2xl font-bold text-green-600">
+                  {property.stockPrice.toLocaleString('en-US')} د.ل
+                </div>
+                <div className="text-sm text-green-700 font-semibold">سعر السهم</div>
+                <div className="text-xs text-green-600">
+                  الحد الأدنى
+                </div>
+              </div>
             </div>
+            
+            {/* Total Investment Value */}
+            {property.totalInvestmentValue && (
+              <div className="mt-3 pt-3 border-t border-blue-200 text-center">
+                <div className="text-sm font-bold text-gray-700">
+                  إجمالي قيمة الاستثمار
+                </div>
+                <div className="text-lg font-bold text-gray-900">
+                  {formatPrice(property.totalInvestmentValue)}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Price Section - Responsive */}
+        <div className="mb-4 sm:mb-5">
+          <div className="flex items-center gap-3 mb-3">
+            <span className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-600">
+              {formatPrice(property.price)}
+            </span>
+            {property.originalPrice && property.originalPrice > property.price && (
+              <span className="text-sm text-gray-500 line-through">
+                {formatPrice(property.originalPrice)}
+              </span>
+            )}
+          </div>
+          
+          {/* Investment Options - Responsive badges */}
+          <div className="flex flex-wrap gap-2">
+            {property.installmentAvailable && (
+              <Badge variant="secondary" className="text-xs px-3 py-1.5 bg-green-100 text-green-700 border-2 border-green-200 font-semibold rounded-xl">
+                تقسيط متاح
+              </Badge>
+            )}
+            {property.sharesAvailable && (
+              <Badge variant="secondary" className="text-xs px-3 py-1.5 bg-blue-100 text-blue-700 border-2 border-blue-200 font-semibold rounded-xl">
+                أسهم متاحة
+              </Badge>
+            )}
           </div>
         </div>
 
-        {/* Investment Options - More Compact */}
-        <div className="flex flex-wrap gap-1 mb-3">
-          {property.installmentAvailable && (
-            <Badge variant="outline" className="text-xs px-2 py-0.5 border-green-300 text-green-700">
-              تقسيط متاح
-            </Badge>
-          )}
-          {property.sharesAvailable && (
-            <Badge variant="outline" className="text-xs px-2 py-0.5 border-blue-300 text-blue-700">
-              أسهم متاحة
-            </Badge>
-          )}
+        {/* Property Details - Responsive grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-5 sm:mb-6">
+          <div className="flex items-center gap-2 text-gray-700 bg-gray-50 rounded-xl p-3">
+            <Bed className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
+            <span className="text-sm sm:text-base font-bold">{property.bedrooms}</span>
+          </div>
+          <div className="flex items-center gap-2 text-gray-700 bg-gray-50 rounded-xl p-3">
+            <Bath className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
+            <span className="text-sm sm:text-base font-bold">{property.bathrooms}</span>
+          </div>
+          <div className="flex items-center gap-2 text-gray-700 bg-gray-50 rounded-xl p-3">
+            <Square className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
+            <span className="text-sm sm:text-base font-bold">{property.area}m²</span>
+          </div>
+          <div className="flex items-center gap-2 text-gray-700 bg-gray-50 rounded-xl p-3">
+            <Car className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
+            <span className="text-sm sm:text-base font-bold">{property.parking}</span>
+          </div>
         </div>
 
-        {/* Action Buttons - More Compact */}
-        <div className="flex gap-2">
-          <Link to={`/properties/${property.id}`} className="flex-1">
-            <Button size="sm" className="w-full h-8 text-xs bg-blue-600 hover:bg-blue-700">
-              عرض التفاصيل
+        {/* Footer - Responsive */}
+        <div className="mt-auto">
+          <div className="flex gap-3">
+            <Link to={`/investments/${property.id}`} className="flex-1">
+              <Button 
+                size="sm" 
+                className="w-full h-11 sm:h-12 text-base font-bold bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] rounded-2xl"
+              >
+                إستثمر الآن
+              </Button>
+            </Link>
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="h-11 sm:h-12 w-11 sm:w-12 p-0 flex-shrink-0 border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-300 rounded-2xl"
+              aria-label="Add to favorites"
+            >
+              <Star className="h-5 w-5 text-gray-600 hover:text-blue-600 transition-colors" />
             </Button>
-          </Link>
-          <Button size="sm" variant="outline" className="h-8 px-3 text-xs">
-            المفضلة
-          </Button>
+          </div>
         </div>
       </CardContent>
     </Card>
