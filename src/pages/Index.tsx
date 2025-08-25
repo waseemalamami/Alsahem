@@ -52,8 +52,8 @@ const Index = () => {
                     <span className="block text-blue-200 mt-2">بالأسهم والأقساط</span>
                   </h1>
                   <p className="text-base sm:text-lg lg:text-xl text-blue-100 leading-relaxed max-w-xl mx-auto lg:mx-0">
-                    منصة السهم توفر لك استثمار آمن في العقارات المميزة من خلال نظام الأسهم أو 
-                    نظام الأقساط المرنة لتحقيق أحلامك العقارية في ليبيا
+                    منصة السهم توفر لك استثمار آمن في العقارات المميزة من خلال نظام الأسهم 
+                    لتحقيق عوائد مجزية في ليبيا
                   </p>
                 </div>
                 
@@ -76,8 +76,13 @@ const Index = () => {
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
                   <Link to="/investments">
                     <Button size="lg" className="w-full sm:w-auto bg-white text-blue-600 hover:bg-blue-50 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
-                      📈 الاستثمارات المتاحة
+                      📈 استكشف الاستثمارات
                       <ArrowRight className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                    </Button>
+                  </Link>
+                  <Link to="/register">
+                    <Button size="lg" variant="outline" className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-blue-600 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
+                      🚀 ابدأ الاستثمار
                     </Button>
                   </Link>
                 </div>
@@ -105,9 +110,9 @@ const Index = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12 sm:mb-16">
             <Badge className="bg-blue-100 text-blue-700 border-blue-200 text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 mb-3 sm:mb-4">
-              خدماتنا
+              الاستثمارات
             </Badge>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">خدماتنا الرئيسية</h2>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">خدمات الاستثمار</h2>
             <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto">اختر الخدمة المناسبة لك وابدأ رحلتك الاستثمارية</p>
           </div>
           

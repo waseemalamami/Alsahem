@@ -10,357 +10,130 @@ import {
 } from '../types/api';
 
 export class UserService {
-  // Get user portfolio
-  static async getPortfolio(): Promise<Portfolio> {
-    const response = await apiClient.get<Portfolio>(
-      API_ENDPOINTS.USER.PORTFOLIO
-    );
-    return response.data;
-  }
-
-  // Get user investments
-  static async getUserInvestments(pagination?: PaginationParams): Promise<PaginatedResponse<UserInvestment>> {
-    const queryParams = new URLSearchParams();
-    
-    if (pagination) {
-      if (pagination.page) queryParams.append('page', pagination.page.toString());
-      if (pagination.limit) queryParams.append('limit', pagination.limit.toString());
-      if (pagination.sortBy) queryParams.append('sortBy', pagination.sortBy);
-      if (pagination.sortOrder) queryParams.append('sortOrder', pagination.sortOrder);
-    }
-
-    const endpoint = `${API_ENDPOINTS.USER.INVESTMENTS}?${queryParams.toString()}`;
-    const response = await apiClient.get<PaginatedResponse<UserInvestment>>(endpoint);
-    return response.data;
-  }
-
-  // Get user investment by ID
-  static async getUserInvestmentById(investmentId: string): Promise<UserInvestment> {
-    const response = await apiClient.get<UserInvestment>(
-      `${API_ENDPOINTS.USER.INVESTMENTS}/${investmentId}`
-    );
-    return response.data;
-  }
-
-  // Get user transactions
-  static async getUserTransactions(pagination?: PaginationParams): Promise<PaginatedResponse<Transaction>> {
-    const queryParams = new URLSearchParams();
-    
-    if (pagination) {
-      if (pagination.page) queryParams.append('page', pagination.page.toString());
-      if (pagination.limit) queryParams.append('limit', pagination.limit.toString());
-      if (pagination.sortBy) queryParams.append('sortBy', pagination.sortBy);
-      if (pagination.sortOrder) queryParams.append('sortOrder', pagination.sortOrder);
-    }
-
-    const endpoint = `${API_ENDPOINTS.USER.TRANSACTIONS}?${queryParams.toString()}`;
-    const response = await apiClient.get<PaginatedResponse<Transaction>>(endpoint);
-    return response.data;
-  }
-
-  // Get transaction by ID
-  static async getTransactionById(transactionId: string): Promise<Transaction> {
-    const response = await apiClient.get<Transaction>(
-      `${API_ENDPOINTS.USER.TRANSACTIONS}/${transactionId}`
-    );
-    return response.data;
-  }
-
-  // Get user profile
+  // Get user profile from auth context (since backend doesn't have a profile endpoint)
   static async getUserProfile(): Promise<{
     id: string;
     name: string;
     email: string;
-    role: 'visitor' | 'investor' | 'admin';
-    avatar?: string;
-    phone?: string;
+    phoneNumber: string;
+    role: string;
     isVerified: boolean;
-    kycStatus?: 'pending' | 'approved' | 'rejected';
-    portfolio?: Portfolio;
-    bankDetails?: {
-      accountNumber: string;
-      bankName: string;
-    };
+    kycStatus?: string;
     createdAt: string;
-    lastLoginAt: string;
-  }> {
-    const response = await apiClient.get<{
-      id: string;
-      name: string;
-      email: string;
-      role: 'visitor' | 'investor' | 'admin';
-      avatar?: string;
-      phone?: string;
-      isVerified: boolean;
-      kycStatus?: 'pending' | 'approved' | 'rejected';
-      portfolio?: Portfolio;
-      bankDetails?: {
-        accountNumber: string;
-        bankName: string;
-      };
-      createdAt: string;
-      lastLoginAt: string;
-    }>(API_ENDPOINTS.USER.PROFILE);
-    return response.data;
+    lastLoginAt?: string;
+  } | null> {
+    try {
+      console.log('🔍 Getting user profile from auth context...');
+      
+      // Get user data from localStorage (stored by AuthContext)
+      const savedUser = localStorage.getItem('saham_user');
+      if (savedUser) {
+        const user = JSON.parse(savedUser);
+        console.log('🔍 User profile from context:', user);
+        
+        return {
+          id: user.id || '',
+          name: user.name || '',
+          email: user.email || '',
+          phoneNumber: user.phone || '',
+          role: user.role || 'investor',
+          isVerified: user.isVerified || true,
+          kycStatus: user.kycStatus || 'pending',
+          createdAt: user.createdAt || new Date().toISOString(),
+          lastLoginAt: user.lastLoginAt || new Date().toISOString(),
+        };
+      }
+      
+      console.log('❌ No user data found in context');
+      return null;
+    } catch (error: any) {
+      console.error('❌ Error getting user profile from context:', error);
+      return null;
+    }
   }
 
-  // Get user statistics
-  static async getUserStatistics(): Promise<{
+  // Get user investments from .NET backend
+  static async getUserInvestments(): Promise<UserInvestment[]> {
+    try {
+      console.log('🔍 Fetching user investments from backend...');
+      
+      const response = await apiClient.get<UserInvestment[]>(
+        API_ENDPOINTS.USER.INVESTMENTS
+      );
+      
+      console.log('🔍 User investments response:', response);
+      
+      return response || [];
+    } catch (error: any) {
+      console.error('❌ Error fetching user investments:', error);
+      return [];
+    }
+  }
+
+  // Get user portfolio summary
+  static async getPortfolioSummary(): Promise<{
     totalInvestments: number;
+    totalValue: number;
+    totalShares: number;
     activeInvestments: number;
     completedInvestments: number;
-    totalInvested: number;
-    totalReturns: number;
-    averageReturn: number;
-    lastInvestmentDate?: string;
-    memberSince: string;
   }> {
-    const response = await apiClient.get<{
-      totalInvestments: number;
-      activeInvestments: number;
-      completedInvestments: number;
-      totalInvested: number;
-      totalReturns: number;
-      averageReturn: number;
-      lastInvestmentDate?: string;
-      memberSince: string;
-    }>(`${API_ENDPOINTS.USER.PORTFOLIO}/statistics`);
-    return response.data;
-  }
-
-  // Get user investment history
-  static async getInvestmentHistory(pagination?: PaginationParams): Promise<PaginatedResponse<{
-    investment: UserInvestment;
-    transaction: Transaction;
-  }>> {
-    const queryParams = new URLSearchParams();
-    
-    if (pagination) {
-      if (pagination.page) queryParams.append('page', pagination.page.toString());
-      if (pagination.limit) queryParams.append('limit', pagination.limit.toString());
-      if (pagination.sortBy) queryParams.append('sortBy', pagination.sortBy);
-      if (pagination.sortOrder) queryParams.append('sortOrder', pagination.sortOrder);
-    }
-
-    const endpoint = `${API_ENDPOINTS.USER.INVESTMENTS}/history?${queryParams.toString()}`;
-    const response = await apiClient.get<PaginatedResponse<{
-      investment: UserInvestment;
-      transaction: Transaction;
-    }>>(endpoint);
-    return response.data;
-  }
-
-  // Get user returns history
-  static async getReturnsHistory(pagination?: PaginationParams): Promise<PaginatedResponse<{
-    date: string;
-    amount: number;
-    investmentId: string;
-    investmentTitle: string;
-    returnPercentage: number;
-  }>> {
-    const queryParams = new URLSearchParams();
-    
-    if (pagination) {
-      if (pagination.page) queryParams.append('page', pagination.page.toString());
-      if (pagination.limit) queryParams.append('limit', pagination.limit.toString());
-      if (pagination.sortBy) queryParams.append('sortBy', pagination.sortBy);
-      if (pagination.sortOrder) queryParams.append('sortOrder', pagination.sortOrder);
-    }
-
-    const endpoint = `${API_ENDPOINTS.USER.PORTFOLIO}/returns?${queryParams.toString()}`;
-    const response = await apiClient.get<PaginatedResponse<{
-      date: string;
-      amount: number;
-      investmentId: string;
-      investmentTitle: string;
-      returnPercentage: number;
-    }>>(endpoint);
-    return response.data;
-  }
-
-  // Get user activity feed
-  static async getActivityFeed(pagination?: PaginationParams): Promise<PaginatedResponse<{
-    id: string;
-    type: 'investment' | 'return' | 'withdrawal' | 'kyc' | 'profile_update';
-    title: string;
-    description: string;
-    amount?: number;
-    date: string;
-    status: 'completed' | 'pending' | 'failed';
-  }>> {
-    const queryParams = new URLSearchParams();
-    
-    if (pagination) {
-      if (pagination.page) queryParams.append('page', pagination.page.toString());
-      if (pagination.limit) queryParams.append('limit', pagination.limit.toString());
-      if (pagination.sortBy) queryParams.append('sortBy', pagination.sortBy);
-      if (pagination.sortOrder) queryParams.append('sortOrder', pagination.sortOrder);
-    }
-
-    const endpoint = `${API_ENDPOINTS.USER.PROFILE}/activity?${queryParams.toString()}`;
-    const response = await apiClient.get<PaginatedResponse<{
-      id: string;
-      type: 'investment' | 'return' | 'withdrawal' | 'kyc' | 'profile_update';
-      title: string;
-      description: string;
-      amount?: number;
-      date: string;
-      status: 'completed' | 'pending' | 'failed';
-    }>>(endpoint);
-    return response.data;
-  }
-
-  // Get user preferences
-  static async getUserPreferences(): Promise<{
-    language: 'ar' | 'en';
-    currency: 'LYD' | 'USD';
-    notifications: {
-      email: boolean;
-      sms: boolean;
-      push: boolean;
-    };
-    privacy: {
-      profileVisibility: 'public' | 'private';
-      showPortfolio: boolean;
-      showInvestments: boolean;
-    };
-  }> {
-    const response = await apiClient.get<{
-      language: 'ar' | 'en';
-      currency: 'LYD' | 'USD';
-      notifications: {
-        email: boolean;
-        sms: boolean;
-        push: boolean;
+    try {
+      console.log('🔍 Fetching portfolio summary from backend...');
+      
+      const userInvestments = await this.getUserInvestments();
+      
+      const totalInvestments = userInvestments.length;
+      const totalValue = userInvestments.reduce((sum, inv) => sum + (inv.amount || 0), 0);
+      const totalShares = userInvestments.reduce((sum, inv) => sum + (inv.shares || 0), 0);
+      const activeInvestments = userInvestments.filter(inv => inv.status === 'active').length;
+      const completedInvestments = userInvestments.filter(inv => inv.status === 'completed').length;
+      
+      return {
+        totalInvestments,
+        totalValue,
+        totalShares,
+        activeInvestments,
+        completedInvestments,
       };
-      privacy: {
-        profileVisibility: 'public' | 'private';
-        showPortfolio: boolean;
-        showInvestments: boolean;
+    } catch (error: any) {
+      console.error('❌ Error fetching portfolio summary:', error);
+      return {
+        totalInvestments: 0,
+        totalValue: 0,
+        totalShares: 0,
+        activeInvestments: 0,
+        completedInvestments: 0,
       };
-    }>(`${API_ENDPOINTS.USER.PREFERENCES}/full`);
-    return response.data;
-  }
-
-  // Update user preferences
-  static async updateUserPreferences(preferences: {
-    language?: 'ar' | 'en';
-    currency?: 'LYD' | 'USD';
-    notifications?: {
-      email?: boolean;
-      sms?: boolean;
-      push?: boolean;
-    };
-    privacy?: {
-      profileVisibility?: 'public' | 'private';
-      showPortfolio?: boolean;
-      showInvestments?: boolean;
-    };
-  }): Promise<{ message: string }> {
-    const response = await apiClient.put<{ message: string }>(
-      `${API_ENDPOINTS.USER.PREFERENCES}/full`,
-      preferences
-    );
-    return response.data;
-  }
-
-  // Get user documents
-  static async getUserDocuments(): Promise<{
-    documents: Array<{
-      id: string;
-      name: string;
-      type: string;
-      url: string;
-      uploadedAt: string;
-      status: 'pending' | 'approved' | 'rejected';
-    }>;
-  }> {
-    const response = await apiClient.get<{
-      documents: Array<{
-        id: string;
-        name: string;
-        type: string;
-        url: string;
-        uploadedAt: string;
-        status: 'pending' | 'approved' | 'rejected';
-      }>;
-    }>(`${API_ENDPOINTS.USER.PROFILE}/documents`);
-    return response.data;
-  }
-
-  // Upload user document
-  static async uploadDocument(file: File, type: string): Promise<{
-    message: string;
-    documentId: string;
-    url: string;
-  }> {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('type', type);
-
-    const response = await apiClient.post<{
-      message: string;
-      documentId: string;
-      url: string;
-    }>(`${API_ENDPOINTS.USER.PROFILE}/documents`, formData);
-    return response.data;
-  }
-
-  // Delete user document
-  static async deleteDocument(documentId: string): Promise<{ message: string }> {
-    const response = await apiClient.delete<{ message: string }>(
-      `${API_ENDPOINTS.USER.PROFILE}/documents/${documentId}`
-    );
-    return response.data;
-  }
-
-  // Get user notifications
-  static async getUserNotifications(pagination?: PaginationParams): Promise<PaginatedResponse<{
-    id: string;
-    title: string;
-    message: string;
-    type: 'info' | 'success' | 'warning' | 'error';
-    isRead: boolean;
-    createdAt: string;
-    actionUrl?: string;
-    actionText?: string;
-  }>> {
-    const queryParams = new URLSearchParams();
-    
-    if (pagination) {
-      if (pagination.page) queryParams.append('page', pagination.page.toString());
-      if (pagination.limit) queryParams.append('limit', pagination.limit.toString());
-      if (pagination.sortBy) queryParams.append('sortBy', pagination.sortBy);
-      if (pagination.sortOrder) queryParams.append('sortOrder', pagination.sortOrder);
     }
-
-    const endpoint = `${API_ENDPOINTS.NOTIFICATIONS.LIST}?${queryParams.toString()}`;
-    const response = await apiClient.get<PaginatedResponse<{
-      id: string;
-      title: string;
-      message: string;
-      type: 'info' | 'success' | 'warning' | 'error';
-      isRead: boolean;
-      createdAt: string;
-      actionUrl?: string;
-      actionText?: string;
-    }>>(endpoint);
-    return response.data;
   }
 
-  // Mark notification as read
-  static async markNotificationAsRead(notificationId: string): Promise<{ message: string }> {
-    const response = await apiClient.put<{ message: string }>(
-      API_ENDPOINTS.NOTIFICATIONS.MARK_READ(notificationId)
-    );
-    return response.data;
-  }
-
-  // Mark all notifications as read
-  static async markAllNotificationsAsRead(): Promise<{ message: string }> {
-    const response = await apiClient.put<{ message: string }>(
-      API_ENDPOINTS.NOTIFICATIONS.MARK_ALL_READ
-    );
-    return response.data;
+  // Update user profile
+  static async updateUserProfile(profileData: {
+    name: string;
+    email: string;
+    phoneNumber: string;
+  }): Promise<{ success: boolean; message: string }> {
+    try {
+      console.log('🔍 Updating user profile...');
+      
+      const response = await apiClient.post<any>(
+        API_ENDPOINTS.AUTH.UPDATE_USER,
+        profileData
+      );
+      
+      console.log('🔍 Update profile response:', response);
+      
+      return {
+        success: true,
+        message: response?.Message || 'Profile updated successfully',
+      };
+    } catch (error: any) {
+      console.error('❌ Error updating user profile:', error);
+      return {
+        success: false,
+        message: error.message || 'Failed to update profile',
+      };
+    }
   }
 } 

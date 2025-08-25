@@ -20,38 +20,49 @@ import { Progress } from "@/components/ui/progress";
 
 interface InvestmentCardProps {
   investment: {
-    id: string;
+    id: number;
     title: string;
-    location: string;
-    totalValue: number;
-    currentValue: number;
+    location?: string;
+    totalValue?: number;
+    currentValue?: number;
     minInvestment: number;
-    expectedReturn: number;
-    duration: number;
-    investors: number;
-    maxInvestors: number;
+    expectedReturn?: number;
+    duration?: number;
+    durationByMonths?: number;
+    investors?: number;
+    maxInvestors?: number;
     status: 'active' | 'funded' | 'completed';
-    image: string;
+    image?: string;
     views: number;
     endDate: string;
-    propertyType: string;
-    riskLevel: 'low' | 'medium' | 'high';
-    // New stock information properties
+    propertyType?: string;
+    riskLevel?: 'low' | 'medium' | 'high';
+    // Stock information properties
     sharesAvailable?: boolean;
     totalShares?: number;
     availableShares?: number;
     stockPrice?: number;
+    sharePrice?: number;
+    description?: string;
   };
   loading?: boolean;
 }
 
 const InvestmentCard = ({ investment, loading = false }: InvestmentCardProps) => {
   const formatCurrency = (amount: number) => {
-    return `${amount.toLocaleString('en-US')} د.ل`;
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+    }).format(amount);
   };
 
-  const formatStockPrice = (price: number) => {
-    return `${price.toLocaleString('en-US')} د.ل`;
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('ar-LY', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
   };
 
   const getStatusColor = (status: string) => {
@@ -81,8 +92,24 @@ const InvestmentCard = ({ investment, loading = false }: InvestmentCardProps) =>
   };
 
   // Calculate funding progress
-  const fundingProgress = (investment.currentValue / investment.totalValue) * 100;
-  const remainingInvestment = investment.totalValue - investment.currentValue;
+  const totalValue = investment.totalValue || (investment.totalShares || 0) * (investment.sharePrice || 0);
+  const currentValue = investment.currentValue || ((investment.totalShares || 0) - (investment.availableShares || 0)) * (investment.sharePrice || 0);
+  const fundingProgress = totalValue > 0 ? (currentValue / totalValue) * 100 : 0;
+  const duration = investment.duration || investment.durationByMonths || 0;
+
+  // Map investment IDs to local images
+  const getInvestmentImage = (id: number) => {
+    const imageMap: { [key: number]: string } = {
+      1: '/images/investments/tripoli-apartment.jpg',
+      2: '/images/investments/benghazi-villa.jpg',
+      4: '/images/investments/misrata-commercial.jpg',
+      5: '/images/investments/albayda-residential.jpg',
+      6: '/images/investments/tobruk-industrial.jpg',
+      7: '/images/investments/sabratha-resort.jpg',
+      8: '/images/investments/zawiya-mall.jpg'
+    };
+    return imageMap[id] || '/images/investments/tripoli-apartment.jpg'; // fallback
+  };
 
   if (loading) {
     return (
@@ -99,88 +126,82 @@ const InvestmentCard = ({ investment, loading = false }: InvestmentCardProps) =>
             <Skeleton className="h-12" />
             <Skeleton className="h-12" />
           </div>
-          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-10 w-full" />
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="group hover:shadow-xl transition-all duration-500 border border-gray-200 overflow-hidden h-full flex flex-col bg-white hover:bg-gray-50/50">
-      {/* Image Section */}
+    <Card className="group hover:shadow-lg transition-all duration-300 border border-gray-200 overflow-hidden">
       <div className="relative">
         <img 
-          src={investment.image} 
+          src={getInvestmentImage(investment.id)} 
           alt={investment.title}
-          className="w-full h-40 sm:h-48 lg:h-52 object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
         />
         
         {/* Status Badge */}
-        <Badge className={`absolute top-3 right-3 text-xs px-3 py-1.5 border-2 font-semibold shadow-lg rounded-xl ${getStatusColor(investment.status)}`}>
-          {getStatusText(investment.status)}
-        </Badge>
-        
-        {/* Expected Return Badge */}
-        <Badge className="absolute top-3 left-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-xs px-3 py-1.5 border-0 font-semibold shadow-lg rounded-xl">
-          <TrendingUp className="h-3 w-3 mr-1" />
-          {investment.expectedReturn}%
-        </Badge>
-        
-        {/* Views */}
-        <div className="absolute bottom-3 right-3 bg-white/95 backdrop-blur-sm rounded-xl px-2.5 py-1.5 flex items-center gap-1.5 shadow-lg">
-          <Eye className="h-3.5 w-3.5 text-gray-600" />
-          <span className="text-xs font-semibold text-gray-700">{investment.views}</span>
+        <div className="absolute top-3 right-3">
+          <Badge className={`${getStatusColor(investment.status)} border-2 font-semibold`}>
+            {getStatusText(investment.status)}
+          </Badge>
+        </div>
+
+        {/* Views Counter */}
+        <div className="absolute top-3 left-3 bg-black/50 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
+          <Eye className="h-3 w-3" />
+          {investment.views || 0}
         </div>
       </div>
 
-      {/* Content Section */}
-      <CardContent className="p-5 sm:p-6 lg:p-7 flex-1 flex flex-col">
-        {/* Header */}
-        <div className="mb-4 sm:mb-5">
-          <div className="flex items-start justify-between gap-3 mb-3">
-            <h3 className="font-bold text-base sm:text-lg lg:text-xl text-gray-900 leading-tight line-clamp-2 flex-1 group-hover:text-blue-700 transition-colors duration-300">
-              {investment.title}
-            </h3>
-            <Badge variant="outline" className="text-xs px-3 py-1.5 flex-shrink-0 border-2 border-blue-200 text-blue-700 bg-blue-50 font-semibold rounded-xl">
-              {investment.propertyType}
-            </Badge>
-          </div>
-          
-          <div className="flex items-center gap-2 text-gray-600 mb-3">
-            <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
-            <span className="text-sm sm:text-base line-clamp-1 font-medium">{investment.location}</span>
+      <CardContent className="p-4">
+        {/* Title and Location */}
+        <div className="mb-3">
+          <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+            {investment.title}
+          </h3>
+          <div className="flex items-center gap-2 text-gray-600 text-sm">
+            <MapPin className="h-4 w-4" />
+            <span>{investment.location || 'طرابلس، ليبيا'}</span>
           </div>
         </div>
 
-        {/* Stock Information - New Section */}
-        {investment.sharesAvailable && investment.totalShares && investment.availableShares && investment.stockPrice && (
-          <div className="mb-4 sm:mb-5 p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border-2 border-blue-200 shadow-sm">
-            <div className="flex items-center gap-2 mb-3">
-              <PieChart className="h-5 w-5 text-blue-600" />
-              <span className="text-sm font-bold text-blue-800">معلومات الأسهم</span>
+        {/* Expected Return */}
+        <div className="mb-4 bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-3 border border-green-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-green-600" />
+              <span className="text-sm font-semibold text-green-800">العائد المتوقع</span>
+            </div>
+            <div className="text-2xl font-bold text-green-600">
+              {investment.expectedReturn || 12}%
+            </div>
+          </div>
+        </div>
+
+        {/* Stock Information */}
+        {investment.totalShares && investment.availableShares && (
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            {/* Available Shares */}
+            <div className="text-center bg-blue-50 rounded-xl p-3 border border-blue-200">
+              <div className="text-xl sm:text-2xl font-bold text-blue-600">
+                {investment.availableShares.toLocaleString('en-US')}
+              </div>
+              <div className="text-sm text-blue-700 font-semibold">الأسهم المتاحة</div>
+              <div className="text-xs text-blue-600">
+                من {investment.totalShares.toLocaleString('en-US')}
+              </div>
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
-              {/* Available Shares */}
-              <div className="text-center">
-                <div className="text-xl sm:text-2xl font-bold text-blue-600">
-                  {investment.availableShares.toLocaleString('en-US')}
-                </div>
-                <div className="text-sm text-blue-700 font-semibold">الأسهم المتاحة</div>
-                <div className="text-xs text-blue-600">
-                  من {investment.totalShares.toLocaleString('en-US')}
-                </div>
+            {/* Stock Price */}
+            <div className="text-center bg-green-50 rounded-xl p-3 border border-green-200">
+              <div className="text-xl sm:text-2xl font-bold text-green-600">
+                {formatCurrency(investment.sharePrice || investment.stockPrice || 0)}
               </div>
-              
-              {/* Stock Price */}
-              <div className="text-center">
-                <div className="text-xl sm:text-2xl font-bold text-green-600">
-                  {investment.stockPrice.toLocaleString('en-US')} د.ل
-                </div>
-                <div className="text-sm text-green-700 font-semibold">سعر السهم</div>
-                <div className="text-xs text-green-600">
-                  الحد الأدنى
-                </div>
+              <div className="text-sm text-green-700 font-semibold">سعر السهم</div>
+              <div className="text-xs text-green-600">
+                الحد الأدنى
               </div>
             </div>
           </div>
@@ -194,8 +215,8 @@ const InvestmentCard = ({ investment, loading = false }: InvestmentCardProps) =>
           </div>
           <Progress value={fundingProgress} className="h-3 mb-3 bg-gray-200" />
           <div className="flex justify-between text-xs text-gray-600 font-medium">
-            <span>تم جمع: {formatCurrency(investment.currentValue)}</span>
-            <span>المطلوب: {formatCurrency(investment.totalValue)}</span>
+            <span>تم جمع: {formatCurrency(currentValue)}</span>
+            <span>المطلوب: {formatCurrency(totalValue)}</span>
           </div>
         </div>
 
@@ -205,7 +226,7 @@ const InvestmentCard = ({ investment, loading = false }: InvestmentCardProps) =>
             <Clock className="h-5 w-5 text-blue-500" />
             <div>
               <div className="text-xs text-gray-500 font-medium">المدة</div>
-              <div className="text-sm font-bold">{investment.duration} شهر</div>
+              <div className="text-sm font-bold">{duration} شهر</div>
             </div>
           </div>
           
@@ -221,7 +242,7 @@ const InvestmentCard = ({ investment, loading = false }: InvestmentCardProps) =>
             <Users className="h-5 w-5 text-purple-500" />
             <div>
               <div className="text-xs text-gray-500 font-medium">المستثمرون</div>
-              <div className="text-sm font-bold">{investment.investors}/{investment.maxInvestors}</div>
+              <div className="text-sm font-bold">{investment.investors || 0}/{investment.maxInvestors || 100}</div>
             </div>
           </div>
           
@@ -229,7 +250,7 @@ const InvestmentCard = ({ investment, loading = false }: InvestmentCardProps) =>
             <Calendar className="h-5 w-5 text-orange-500" />
             <div>
               <div className="text-xs text-gray-500 font-medium">ينتهي</div>
-              <div className="text-sm font-bold">{investment.endDate}</div>
+              <div className="text-sm font-bold">{formatDate(investment.endDate)}</div>
             </div>
           </div>
         </div>

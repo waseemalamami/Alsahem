@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, Eye, EyeOff } from "lucide-react";
+import { Building2, Eye, EyeOff, Phone } from "lucide-react";
 import Navigation from '@/components/Navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { toast } from 'sonner';
 
 const Login = () => {
-  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const { login, isLoading, error, clearError } = useAuth();
@@ -20,16 +20,34 @@ const Login = () => {
     }
   }, [error, clearError]);
 
+  const validateForm = () => {
+    if (!phoneNumber.trim()) {
+      toast.error("يرجى إدخال رقم الهاتف");
+      return false;
+    }
+
+    if (phoneNumber.length < 10) {
+      toast.error("يرجى إدخال رقم هاتف صحيح");
+      return false;
+    }
+
+    if (!password) {
+      toast.error("يرجى إدخال كلمة المرور");
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !password) {
-      toast.error("يرجى إدخال البريد الإلكتروني وكلمة المرور");
+    if (!validateForm()) {
       return;
     }
 
     try {
-      await login({ email, password });
+      await login({ phoneNumber: phoneNumber.trim(), password });
       toast.success("تم تسجيل الدخول بنجاح!");
     } catch (error) {
       // Error is handled by the context
@@ -54,17 +72,21 @@ const Login = () => {
             <CardContent className="p-6">
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    className="w-full p-3 rounded border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="example@email.com"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">رقم الهاتف *</label>
+                  <div className="relative">
+                    <input
+                      type="tel"
+                      value={phoneNumber}
+                      onChange={e => setPhoneNumber(e.target.value)}
+                      className="w-full p-3 pr-10 rounded border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="0912345678"
+                      required
+                    />
+                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">كلمة المرور</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">كلمة المرور *</label>
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
@@ -72,6 +94,7 @@ const Login = () => {
                       onChange={e => setPassword(e.target.value)}
                       className="w-full p-3 pr-10 rounded border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="••••••••"
+                      required
                     />
                     <button
                       type="button"
@@ -99,6 +122,16 @@ const Login = () => {
               </form>
             </CardContent>
           </Card>
+          
+          {/* Additional Info */}
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              ليس لديك حساب؟{' '}
+              <a href="/register" className="text-blue-600 hover:underline font-medium">
+                إنشاء حساب جديد
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </div>

@@ -1,136 +1,199 @@
-# Saham Real Estate Design
+# 🏢 Saham Real Estate Investment Platform
 
-A modern, responsive real estate investment platform built with React and TypeScript. This application provides a comprehensive solution for property investment management, featuring user authentication, property browsing, investment tracking, and financial tools.
+A modern real estate investment platform built with React/TypeScript frontend and .NET Core backend, featuring JWT authentication, investment management, and user dashboard.
 
-## 🚀 Features
+## 🌟 Features
 
-- **User Authentication**: Secure login/registration system with role-based access
-- **Property Management**: Browse and filter properties with detailed information
-- **Investment Tracking**: Monitor investment portfolios and performance
-- **Financial Tools**: Installment calculator and investment analysis
-- **Responsive Design**: Mobile-first approach with modern UI components
-- **Dashboard**: Personalized user dashboard with notifications
-- **Real-time Updates**: Dynamic property listings and investment updates
+- **🔐 Secure Authentication**: JWT-based user authentication and authorization
+- **💰 Investment Management**: Browse and invest in real estate projects
+- **📊 User Dashboard**: Track investments, portfolio, and transactions
+- **🎨 Modern UI**: Responsive design with Arabic RTL support
+- **📱 Mobile Friendly**: Optimized for all device sizes
+- **🔍 Real-time Data**: Live investment updates and market data
 
-## 🛠️ Tech Stack
+## 🏗️ Architecture
 
-- **Frontend Framework**: React 18 with TypeScript
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS
-- **UI Components**: shadcn/ui with Radix UI primitives
-- **State Management**: React Query (TanStack Query)
+### Frontend (React + TypeScript)
+- **Framework**: React 18 with TypeScript
+- **Styling**: Tailwind CSS with shadcn/ui components
+- **State Management**: React Context API
 - **Routing**: React Router DOM
-- **Form Handling**: React Hook Form with Zod validation
-- **Charts**: Recharts for data visualization
-- **Icons**: Lucide React
+- **Build Tool**: Vite
+- **Language**: Arabic RTL support
 
-## 📦 Installation
+### Backend (.NET Core)
+- **Framework**: .NET Core 8
+- **Database**: Entity Framework Core with SQL Server
+- **Authentication**: JWT Bearer tokens
+- **API**: RESTful endpoints
+- **CORS**: Configured for frontend communication
 
-1. Clone the repository:
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 18+ 
+- .NET Core 8 SDK
+- SQL Server (or SQLite for development)
+- Git
+
+### Frontend Setup
 ```bash
-git clone <your-repo-url>
-cd saham-real-estate-design
-```
+# Clone the repository
+git clone https://github.com/yourusername/saham-real-estate.git
+cd saham-real-estate
 
-2. Install dependencies:
-```bash
+# Install dependencies
 npm install
-```
 
-3. Create environment file:
-```bash
-cp env.example .env
-```
-
-4. Start the development server:
-```bash
+# Start development server
 npm run dev
 ```
 
-## 🔧 Available Scripts
+### Backend Setup
+```bash
+# Navigate to backend directory
+cd SahamRealEstateAPI
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run build:dev` - Build for development
-- `npm run lint` - Run ESLint
-- `npm run preview` - Preview production build
+# Restore packages
+dotnet restore
+
+# Run migrations
+dotnet ef database update
+
+# Start the API
+dotnet run
+```
+
+### Environment Variables
+
+#### Frontend (.env)
+```env
+VITE_API_URL=https://localhost:7000/api
+```
+
+#### Backend (appsettings.json)
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost;Database=SahamRealEstate;Trusted_Connection=true;"
+  },
+  "JwtSettings": {
+    "SecretKey": "your-secret-key-here",
+    "Issuer": "SahamRealEstate",
+    "Audience": "SahamRealEstateUsers"
+  }
+}
+```
 
 ## 📁 Project Structure
 
 ```
-src/
-├── components/          # Reusable UI components
-│   ├── ui/             # shadcn/ui components
-│   └── ...             # Custom components
-├── contexts/           # React contexts
-├── hooks/              # Custom React hooks
-├── lib/                # Utility libraries
-├── pages/              # Page components
-├── services/           # API services
-├── types/              # TypeScript type definitions
-└── styles/             # Global styles
+saham-real-estate/
+├── src/                    # Frontend source
+│   ├── components/         # React components
+│   ├── pages/             # Page components
+│   ├── services/          # API services
+│   ├── contexts/          # React contexts
+│   ├── hooks/             # Custom hooks
+│   ├── types/             # TypeScript types
+│   └── lib/               # Utilities
+├── SahamRealEstateAPI/    # Backend source
+│   ├── Controllers/       # API controllers
+│   ├── Data/             # Entity Framework models
+│   ├── Services/         # Business logic
+│   └── Extensions/       # Custom extensions
+├── public/               # Static assets
+└── docs/                 # Documentation
 ```
 
-## 🎯 Key Components
+## 🔧 API Endpoints
 
-- **Navigation**: Responsive navigation with mobile menu
-- **PropertyCard**: Property listing display component
-- **InvestmentCard**: Investment portfolio item
-- **InstallmentCalculator**: Financial calculation tool
-- **UserDashboard**: Personalized user interface
-- **ProtectedRoute**: Route protection component
+### Authentication
+- `POST /api/Account/RegisterNewUser` - User registration
+- `POST /api/Account/Login` - User login
+- `PUT /api/Account/UpdateUser` - Update user profile
 
-## 🔐 Authentication
+### Investments
+- `GET /api/Investment/getAllInvestment` - Get all investments
+- `POST /api/Investment/addNewInvestment` - Create new investment
+- `GET /api/Investment/GetInvestmentById/{id}` - Get investment details
 
-The application includes a complete authentication system with:
-- User registration and login
-- Protected routes
-- Role-based access control
-- User profile management
+### User Investments
+- `GET /api/UserInvestment/getAllUserInvestment` - Get user investments
+- `POST /api/UserInvestment/addNewUserInvestment` - Create user investment
+
+### Properties
+- `GET /api/Property/getAllProperty` - Get all properties
+
+## 🎨 UI Components
+
+Built with shadcn/ui components:
+- Cards, Buttons, Forms
+- Navigation, Modals, Alerts
+- Progress bars, Badges
+- Responsive design with Tailwind CSS
+
+## 🔒 Security Features
+
+- JWT token authentication
+- Password hashing
+- CORS configuration
+- Input validation
+- Error handling
 
 ## 📱 Responsive Design
 
-Built with mobile-first approach:
-- Responsive grid layouts
-- Mobile-optimized navigation
+- Mobile-first approach
+- Tablet and desktop optimized
+- Arabic RTL support
 - Touch-friendly interfaces
-- Adaptive component sizing
 
 ## 🚀 Deployment
 
-This project can be deployed to various platforms:
+### Frontend (Vercel/Netlify)
+```bash
+# Build for production
+npm run build
 
-### Vercel (Recommended)
-1. Connect your GitHub repository to Vercel
-2. Configure build settings:
-   - Build Command: `npm run build`
-   - Output Directory: `dist`
-3. Deploy automatically on every push
+# Deploy to Vercel
+vercel --prod
+```
 
-### Netlify
-1. Connect your GitHub repository to Netlify
-2. Set build command: `npm run build`
-3. Set publish directory: `dist`
+### Backend (Azure/AWS)
+```bash
+# Publish for production
+dotnet publish -c Release
 
-### GitHub Pages
-1. Build the project: `npm run build`
-2. Deploy the `dist` folder to GitHub Pages
+# Deploy to Azure App Service
+az webapp deploy --resource-group myResourceGroup --name myAppName --src-path ./bin/Release/net8.0/publish
+```
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/new-feature`
-3. Commit your changes: `git commit -am 'Add new feature'`
-4. Push to the branch: `git push origin feature/new-feature`
-5. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
-- Built with [Vite](https://vitejs.dev/)
-- UI components from [shadcn/ui](https://ui.shadcn.com/)
-- Icons from [Lucide](https://lucide.dev/)
-- Originally developed with [Lovable](https://lovable.dev/)
+- [shadcn/ui](https://ui.shadcn.com/) for beautiful components
+- [Tailwind CSS](https://tailwindcss.com/) for styling
+- [React](https://reactjs.org/) for the frontend framework
+- [.NET Core](https://dotnet.microsoft.com/) for the backend framework
+
+## 📞 Support
+
+For support and questions:
+- Create an issue in this repository
+- Email: support@sahamrealestate.com
+- Documentation: [docs/](docs/)
+
+---
+
+**Built with ❤️ for the Libyan real estate market**

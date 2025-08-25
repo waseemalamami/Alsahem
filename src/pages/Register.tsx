@@ -23,21 +23,65 @@ const Register = () => {
     }
   }, [error, clearError]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!name || !email || !password) {
-      toast.error("يرجى إدخال جميع البيانات المطلوبة");
-      return;
+  const validateForm = () => {
+    if (!name.trim()) {
+      toast.error("يرجى إدخال الاسم الكامل");
+      return false;
+    }
+
+    if (!email.trim()) {
+      toast.error("يرجى إدخال البريد الإلكتروني");
+      return false;
+    }
+
+    if (!email.includes('@')) {
+      toast.error("يرجى إدخال بريد إلكتروني صحيح");
+      return false;
+    }
+
+    if (!phone.trim()) {
+      toast.error("يرجى إدخال رقم الهاتف");
+      return false;
+    }
+
+    if (phone.length < 10) {
+      toast.error("يرجى إدخال رقم هاتف صحيح");
+      return false;
+    }
+
+    if (!password) {
+      toast.error("يرجى إدخال كلمة المرور");
+      return false;
+    }
+
+    if (password.length < 6) {
+      toast.error("كلمة المرور يجب أن تكون 6 أحرف على الأقل");
+      return false;
     }
 
     if (!agreeToTerms) {
       toast.error("يجب الموافقة على الشروط والأحكام");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
       return;
     }
 
     try {
-      await register({ name, email, password, phone, agreeToTerms });
+      await register({ 
+        name: name.trim(), 
+        email: email.trim(), 
+        password, 
+        phone: phone.trim(), 
+        agreeToTerms 
+      });
       toast.success("تم إنشاء الحساب بنجاح!");
     } catch (error) {
       // Error is handled by the context
@@ -63,7 +107,7 @@ const Register = () => {
             <CardContent className="p-6">
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">الاسم الكامل</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">الاسم الكامل *</label>
                   <div className="relative">
                     <input
                       type="text"
@@ -71,13 +115,14 @@ const Register = () => {
                       onChange={e => setName(e.target.value)}
                       className="w-full p-3 pr-10 rounded border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="اسمك الكامل"
+                      required
                     />
                     <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   </div>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني *</label>
                   <div className="relative">
                     <input
                       type="email"
@@ -85,27 +130,29 @@ const Register = () => {
                       onChange={e => setEmail(e.target.value)}
                       className="w-full p-3 pr-10 rounded border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="example@email.com"
+                      required
                     />
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   </div>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">رقم الهاتف (اختياري)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">رقم الهاتف *</label>
                   <div className="relative">
                     <input
                       type="tel"
                       value={phone}
                       onChange={e => setPhone(e.target.value)}
                       className="w-full p-3 pr-10 rounded border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="+218 91 234 5678"
+                      placeholder="0912345678"
+                      required
                     />
                     <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   </div>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">كلمة المرور</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">كلمة المرور *</label>
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
@@ -113,6 +160,8 @@ const Register = () => {
                       onChange={e => setPassword(e.target.value)}
                       className="w-full p-3 pr-10 rounded border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="••••••••"
+                      minLength={6}
+                      required
                     />
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <button
@@ -132,9 +181,10 @@ const Register = () => {
                     checked={agreeToTerms}
                     onChange={e => setAgreeToTerms(e.target.checked)}
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    required
                   />
                   <label htmlFor="terms" className="mr-2 block text-sm text-gray-700">
-                    أوافق على <a href="#" className="text-blue-600 hover:underline">الشروط والأحكام</a>
+                    أوافق على <a href="#" className="text-blue-600 hover:underline">الشروط والأحكام</a> *
                   </label>
                 </div>
                 

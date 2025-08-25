@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { AuthState, User, Investor, Visitor, LoginCredentials, RegisterData } from '../types/user';
+import { AuthService } from '../services/auth.service';
 
 // Initial state
 const initialState: AuthState = {
@@ -141,37 +142,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     dispatch({ type: 'LOGIN_START' });
     
     try {
-      // Mock API call - replace with real API
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await AuthService.login({
+        phoneNumber: credentials.phoneNumber || credentials.email,
+        password: credentials.password
+      });
       
-      // Simulate successful login
-      const mockUser: Investor = {
-        id: '1',
-        name: 'أحمد محمد',
-        email: credentials.email,
-        role: 'investor',
-        avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
-        phone: '+218 91 234 5678',
-        isVerified: true,
-        createdAt: '2024-01-01',
-        lastLoginAt: new Date().toISOString(),
-        portfolio: {
-          totalInvested: 150000,
-          activeInvestments: 3,
-          completedInvestments: 2,
-          totalReturns: 25000,
-          averageReturn: 15.5
-        },
-        kycStatus: 'approved',
-        bankDetails: {
-          accountNumber: '1234567890',
-          bankName: 'بنك ليبيا المركزي'
-        }
-      };
-      
-      dispatch({ type: 'LOGIN_SUCCESS', payload: mockUser });
-    } catch (error) {
-      dispatch({ type: 'LOGIN_FAILURE', payload: 'فشل في تسجيل الدخول. يرجى التحقق من البيانات.' });
+      if (response.success && response.user) {
+        const user: Investor = {
+          id: response.user.id,
+          name: response.user.name,
+          email: response.user.email,
+          role: 'investor',
+          avatar: undefined,
+          phone: response.user.phoneNumber,
+          isVerified: true,
+          createdAt: new Date().toISOString(),
+          lastLoginAt: new Date().toISOString(),
+          portfolio: {
+            totalInvested: 0,
+            activeInvestments: 0,
+            completedInvestments: 0,
+            totalReturns: 0,
+            averageReturn: 0
+          },
+          kycStatus: 'pending'
+        };
+        
+        dispatch({ type: 'LOGIN_SUCCESS', payload: user });
+      } else {
+        dispatch({ type: 'LOGIN_FAILURE', payload: response.message || 'فشل في تسجيل الدخول. يرجى التحقق من البيانات.' });
+      }
+    } catch (error: any) {
+      dispatch({ type: 'LOGIN_FAILURE', payload: error.message || 'فشل في تسجيل الدخول. يرجى التحقق من البيانات.' });
     }
   };
 
@@ -179,37 +181,51 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     dispatch({ type: 'REGISTER_START' });
     
     try {
-      // Mock API call - replace with real API
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Simulate successful registration
-      const mockUser: Investor = {
-        id: '2',
+      const response = await AuthService.register({
         name: data.name,
         email: data.email,
-        role: 'investor',
-        avatar: undefined,
-        phone: data.phone,
-        isVerified: false,
-        createdAt: new Date().toISOString(),
-        lastLoginAt: new Date().toISOString(),
-        portfolio: {
-          totalInvested: 0,
-          activeInvestments: 0,
-          completedInvestments: 0,
-          totalReturns: 0,
-          averageReturn: 0
-        },
-        kycStatus: 'pending'
-      };
+        phoneNumber: data.phone || '',
+        password: data.password,
+        userType: 1 // Default to investor type
+      });
       
-      dispatch({ type: 'REGISTER_SUCCESS', payload: mockUser });
-    } catch (error) {
-      dispatch({ type: 'REGISTER_FAILURE', payload: 'فشل في إنشاء الحساب. يرجى المحاولة مرة أخرى.' });
+      if (response.success) {
+        // Create user object for successful registration
+        const user: Investor = {
+          id: response.userId || 'new-user',
+          name: data.name,
+          email: data.email,
+          role: 'investor',
+          avatar: undefined,
+          phone: data.phone || '',
+          isVerified: false,
+          createdAt: new Date().toISOString(),
+          lastLoginAt: new Date().toISOString(),
+          portfolio: {
+            totalInvested: 0,
+            activeInvestments: 0,
+            completedInvestments: 0,
+            totalReturns: 0,
+            averageReturn: 0
+          },
+          kycStatus: 'pending'
+        };
+        
+        dispatch({ type: 'REGISTER_SUCCESS', payload: user });
+      } else {
+        dispatch({ type: 'REGISTER_FAILURE', payload: response.message || 'فشل في إنشاء الحساب. يرجى المحاولة مرة أخرى.' });
+      }
+    } catch (error: any) {
+      dispatch({ type: 'REGISTER_FAILURE', payload: error.message || 'فشل في إنشاء الحساب. يرجى المحاولة مرة أخرى.' });
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await AuthService.logout();
+    } catch (error) {
+      // Ignore logout errors
+    }
     dispatch({ type: 'LOGOUT' });
   };
 

@@ -60,6 +60,17 @@ const Navigation = () => {
               <span>الرئيسية</span>
             </Link>
             
+            {/* Properties link hidden for now - focusing on investments */}
+            {/* <Link 
+              to="/properties" 
+              className={`flex items-center space-x-1.5 space-x-reverse px-3 py-2 rounded-md transition-colors text-sm font-medium ${
+                isActive('/properties') ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+              }`}
+            >
+              <Building2 className="h-4 w-4" />
+              <span>العقارات</span>
+            </Link> */}
+            
             <Link 
               to="/investments" 
               className={`flex items-center space-x-1.5 space-x-reverse px-3 py-2 rounded-md transition-colors text-sm font-medium ${
@@ -163,6 +174,18 @@ const Navigation = () => {
                 <Home className="h-5 w-5" />
                 <span>الرئيسية</span>
               </Link>
+              
+              {/* Properties link hidden for now - focusing on investments */}
+              {/* <Link 
+                to="/properties" 
+                className={`flex items-center space-x-2 space-x-reverse px-4 py-3 rounded-lg transition-colors text-base font-medium ${
+                  isActive('/properties') ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+                }`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Building2 className="h-5 w-5" />
+                <span>العقارات</span>
+              </Link> */}
               
               <Link 
                 to="/investments" 

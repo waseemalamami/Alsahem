@@ -1,6 +1,6 @@
 // Application Configuration
 export const APP_CONFIG = {
-  API_BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1',
+  API_BASE_URL: import.meta.env.VITE_API_URL || 'https://localhost:7000/api',
   APP_NAME: 'Saham Real Estate',
   APP_VERSION: '1.0.0',
   DEFAULT_LOCALE: 'ar',
@@ -12,67 +12,81 @@ export const APP_CONFIG = {
 export const API_ENDPOINTS = {
   // Authentication
   AUTH: {
-    LOGIN: '/auth/login',
-    REGISTER: '/auth/register',
-    LOGOUT: '/auth/logout',
-    ME: '/auth/me',
-    REFRESH: '/auth/refresh',
-    FORGOT_PASSWORD: '/auth/forgot-password',
-    RESET_PASSWORD: '/auth/reset-password',
+    LOGIN: '/Account/Login',
+    REGISTER: '/Account/RegisterNewUser',
+    LOGOUT: '/Account/Logout',
+    ME: '/Account/Me',
+    REFRESH: '/Account/Refresh',
+    FORGOT_PASSWORD: '/Account/ForgotPassword',
+    RESET_PASSWORD: '/Account/ResetPassword',
+    UPDATE_USER: '/Account/UpdateUser',
   },
   
   // User Management
   USER: {
-    PROFILE: '/user/profile',
-    UPDATE_PROFILE: '/user/profile',
-    KYC: '/user/kyc',
-    PORTFOLIO: '/user/portfolio',
-    INVESTMENTS: '/user/investments',
-    TRANSACTIONS: '/user/transactions',
-    BANK_DETAILS: '/user/bank-details',
-    PREFERENCES: '/user/preferences',
+    PROFILE: '/Account/Profile',
+    UPDATE_PROFILE: '/Account/UpdateUser',
+    KYC: '/User/KYC',
+    PORTFOLIO: '/User/Portfolio',
+    INVESTMENTS: '/UserInvestment/getAllUserInvestment',
+    TRANSACTIONS: '/User/Transactions',
+    BANK_DETAILS: '/User/BankDetails',
+    PREFERENCES: '/User/Preferences',
   },
   
   // Investments
   INVESTMENTS: {
-    LIST: '/investments',
-    DETAIL: (id: string) => `/investments/${id}`,
-    INVEST: (id: string) => `/investments/${id}/invest`,
-    SEARCH: '/investments/search',
-    FILTER: '/investments/filter',
-    STATISTICS: '/investments/statistics',
+    LIST: '/Investment/getAllInvestment',
+    DETAIL: (id: string) => `/Investment/GetInvestmentById/${id}`,
+    INVEST: (id: string) => `/Investment/Invest/${id}`,
+    SEARCH: '/Investment/Search',
+    FILTER: '/Investment/Filter',
+    STATISTICS: '/Investment/Statistics',
   },
   
   // Properties
   PROPERTIES: {
-    LIST: '/properties',
-    DETAIL: (id: string) => `/properties/${id}`,
-    SEARCH: '/properties/search',
-    FILTER: '/properties/filter',
-    GALLERY: (id: string) => `/properties/${id}/gallery`,
+    LIST: '/Property/getAllProperty',
+    DETAIL: (id: string) => `/Property/getPropertyById/${id}`,
+    SEARCH: '/Property/Search',
+    FILTER: '/Property/Filter',
+    GALLERY: (id: string) => `/Property/getPropertyImages/${id}`,
+    BY_CITY: (cityId: string) => `/Property/getPropertyByCityId/${cityId}`,
+    BY_TYPE: (typeId: string) => `/Property/getPropertyByTypePropertyId/${typeId}`,
+  },
+  
+  // Cities and Types
+  CITIES: {
+    LIST: '/City/GetAllCities',
+    DETAIL: (id: string) => `/City/GetCityById/${id}`,
+  },
+  
+  PROPERTY_TYPES: {
+    LIST: '/TypeProperty/getAllTypeProperty',
+    DETAIL: (id: string) => `/TypeProperty/getTypePropertyById/${id}`,
   },
   
   // Admin (if needed)
   ADMIN: {
-    USERS: '/admin/users',
-    INVESTMENTS: '/admin/investments',
-    STATISTICS: '/admin/statistics',
-    SETTINGS: '/admin/settings',
+    USERS: '/Admin/Users',
+    INVESTMENTS: '/Admin/Investments',
+    STATISTICS: '/Admin/Statistics',
+    SETTINGS: '/Admin/Settings',
   },
   
   // File Upload
   UPLOAD: {
-    IMAGE: '/upload/image',
-    DOCUMENT: '/upload/document',
-    AVATAR: '/upload/avatar',
+    IMAGE: '/Upload/Image',
+    DOCUMENT: '/Upload/Document',
+    AVATAR: '/Upload/Avatar',
   },
   
   // Notifications
   NOTIFICATIONS: {
-    LIST: '/notifications',
-    MARK_READ: (id: string) => `/notifications/${id}/read`,
-    MARK_ALL_READ: '/notifications/mark-all-read',
-    SETTINGS: '/notifications/settings',
+    LIST: '/Notification/GetAllNotifications',
+    MARK_READ: (id: string) => `/Notification/MarkAsRead/${id}`,
+    MARK_ALL_READ: '/Notification/MarkAllAsRead',
+    SETTINGS: '/Notification/Settings',
   },
 } as const;
 
